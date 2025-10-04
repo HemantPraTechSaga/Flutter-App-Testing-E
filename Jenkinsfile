@@ -1,7 +1,9 @@
 pipeline{
     agent any 
     environment {
-        PATH = "/tmp/workspace/flutter/bin:${env.PATH}"
+        FLUTTER_HOME = "/tmp/workspace/flutter"
+        PUB_CACHE = "/var/jenkins_home/.pub-cache"   // persistent cache location
+        PATH = "${FLUTTER_HOME}/bin:${env.PATH}"
     }
     stages {
         // stage("Checkout"){
@@ -10,10 +12,16 @@ pipeline{
         //         git branch: 'main', url: 'https://github.com/HemantPraTechSaga/Flutter-App-Testing-E.git'
         //     }
         // }
-        stage("Setup"){
-            steps{
+        stage("Setup") {
+            steps {
                 echo "Current PATH: ${env.PATH}"
+                echo "Using Flutter at: ${env.FLUTTER_HOME}"
+                echo "Using PUB_CACHE at: ${env.PUB_CACHE}"
+                
+                // Mark workspace safe to avoid Git ownership warnings
                 sh "git config --global --add safe.directory ${WORKSPACE} || true"
+
+                // Get dependencies
                 sh "flutter pub get"
             }
         }
